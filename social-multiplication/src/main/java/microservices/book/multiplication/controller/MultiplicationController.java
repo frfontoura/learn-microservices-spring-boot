@@ -1,6 +1,5 @@
 package microservices.book.multiplication.controller;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.service.MultiplicationService;

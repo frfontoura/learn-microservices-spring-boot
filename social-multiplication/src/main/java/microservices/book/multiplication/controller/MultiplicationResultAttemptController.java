@@ -1,15 +1,12 @@
 package microservices.book.multiplication.controller;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.service.MultiplicationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author frfontoura
@@ -23,15 +20,20 @@ public final class MultiplicationResultAttemptController {
     private final MultiplicationService multiplicationService;
 
     @PostMapping
-    public ResponseEntity<ResultResponse> postResult(@RequestBody final MultiplicationResultAttempt attempt) {
+    public ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody final MultiplicationResultAttempt attempt) {
         final boolean correct = multiplicationService.checkAttempt(attempt);
-        return ResponseEntity.ok(new ResultResponse(correct));
+        final MultiplicationResultAttempt checkedAttempt = new MultiplicationResultAttempt(
+                attempt.getUser(),
+                attempt.getMultiplication(),
+                attempt.getResultAttempt(),
+                correct
+        );
+        return ResponseEntity.ok(checkedAttempt);
     }
 
-    @RequiredArgsConstructor
-    @NoArgsConstructor(force = true)
-    @Getter
-    static final class ResultResponse {
-        private final boolean correct;
+    @GetMapping
+    public ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") final String alias) {
+        return ResponseEntity.ok(multiplicationService.getStatsForUser(alias));
     }
+
 }
