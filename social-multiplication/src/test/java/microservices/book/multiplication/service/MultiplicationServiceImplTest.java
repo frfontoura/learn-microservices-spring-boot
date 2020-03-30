@@ -3,6 +3,8 @@ package microservices.book.multiplication.service;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.domain.User;
+import microservices.book.multiplication.event.EventDispatcher;
+import microservices.book.multiplication.event.MultiplicationSolvedEvent;
 import microservices.book.multiplication.repository.MultiplicationResultAttemptRepository;
 import microservices.book.multiplication.repository.UserRepository;
 import org.assertj.core.util.Lists;
@@ -15,8 +17,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -30,6 +33,9 @@ public class MultiplicationServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private EventDispatcher eventDispatcher;
 
     @InjectMocks
     private MultiplicationServiceImpl multiplicationService;
@@ -47,16 +53,18 @@ public class MultiplicationServiceImplTest {
 
     @Test
     public void checkCorrectAttemptTest() {
-        Multiplication multiplication = new Multiplication(50,60);
-        User user = new User("tony_stark");
-        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000, false);
-        MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(user, multiplication, 3000, true);
+        final Multiplication multiplication = new Multiplication(50,60);
+        final User user = new User("tony_stark");
+        final MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000, false);
+        final MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(user, multiplication, 3000, true);
+        final MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(), attempt.getUser().getId(), true);
         given(userRepository.findByAlias("tony_stark")).willReturn(Optional.empty());
 
         boolean attemptResult = multiplicationService.checkAttempt(attempt);
 
         assertThat(attemptResult).isTrue();
         verify(attemptRepository).save(verifiedAttempt);
+        verify(eventDispatcher).send(eq(event));
     }
 
     @Test

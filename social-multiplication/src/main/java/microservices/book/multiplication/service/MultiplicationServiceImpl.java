@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.domain.User;
+import microservices.book.multiplication.event.EventDispatcher;
+import microservices.book.multiplication.event.MultiplicationSolvedEvent;
 import microservices.book.multiplication.repository.MultiplicationResultAttemptRepository;
 import microservices.book.multiplication.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class MultiplicationServiceImpl implements MultiplicationService {
     private final RandomGeneratorService randomGeneratorService;
     private final MultiplicationResultAttemptRepository attemptRepository;
     private final UserRepository userRepository;
+    private final EventDispatcher eventDispatcher;
 
     @Override
     public Multiplication createRandomMultiplication() {
@@ -31,6 +35,7 @@ public class MultiplicationServiceImpl implements MultiplicationService {
         return new Multiplication(factorA, factorB);
     }
 
+    @Transactional
     @Override
     public boolean checkAttempt(final MultiplicationResultAttempt attempt) {
         Assert.isTrue(!attempt.isCorrect(), "You can't send an attempt marked as correct!");
@@ -48,6 +53,11 @@ public class MultiplicationServiceImpl implements MultiplicationService {
         );
 
         attemptRepository.save(checkedAttempt);
+
+        eventDispatcher.send(new MultiplicationSolvedEvent(checkedAttempt.getId(),
+                checkedAttempt.getUser().getId(),
+                checkedAttempt.isCorrect()));
+
         return correct;
     }
 
