@@ -8,7 +8,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * Event that models the fact that a {@link microservices.book.multiplication.domain.Multiplication}
+ * Event that models the fact that a Multiplication
  * has been solved in the system. Provides some context information about the multiplication.
  *
  * @author frfontoura
@@ -23,5 +23,9 @@ public class MultiplicationSolvedEvent implements Serializable {
     private final Long multiplicationResultAttemptId;
     private final Long userId;
     private final boolean correct;
+
+    private MultiplicationSolvedEvent() {
+        this(null, null, false);
+    }
 
 }

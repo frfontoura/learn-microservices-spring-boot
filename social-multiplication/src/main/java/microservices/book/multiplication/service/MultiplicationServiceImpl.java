@@ -40,7 +40,7 @@ public class MultiplicationServiceImpl implements MultiplicationService {
     public boolean checkAttempt(final MultiplicationResultAttempt attempt) {
         Assert.isTrue(!attempt.isCorrect(), "You can't send an attempt marked as correct!");
 
-        Optional<User> user = userRepository.findByAlias(attempt.getUser().getAlias());
+        final Optional<User> user = userRepository.findByAlias(attempt.getUser().getAlias());
 
         final boolean correct = attempt.getResultAttempt() ==
                 attempt.getMultiplication().getFactorA() * attempt.getMultiplication().getFactorB();
@@ -62,7 +62,13 @@ public class MultiplicationServiceImpl implements MultiplicationService {
     }
 
     @Override
-    public List<MultiplicationResultAttempt> getStatsForUser(String userAlias) {
+    public List<MultiplicationResultAttempt> getStatsForUser(final String userAlias) {
         return attemptRepository.findTop5ByUserAliasOrderByIdDesc(userAlias);
     }
+
+    @Override
+    public MultiplicationResultAttempt getResultById(final Long resultId) {
+        return attemptRepository.findOne(resultId);
+    }
+
 }

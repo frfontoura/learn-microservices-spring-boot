@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +28,12 @@ public class GameStats {
     private final int score;
     private final List<Badge> badges;
 
+    private GameStats() {
+        this.userId = 0l;
+        this.score = 0;
+        this.badges = new ArrayList<>();
+    }
+
     /**
      * Factory method to build an empty instance (zero points and no badges)
      * @param userId the user's id
@@ -43,12 +48,6 @@ public class GameStats {
      */
     public List<Badge> getBadges() {
         return Collections.unmodifiableList(badges);
-    }
-
-    private GameStats() {
-        this.userId = 0l;
-        this.score = 0;
-        this.badges = new ArrayList<>();
     }
 
 }
