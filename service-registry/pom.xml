@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>microservices.book</groupId>
-	<artifactId>gateway-v8</artifactId>
+	<artifactId>service-registry</artifactId>
 	<version>0.8.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>gateway-v8</name>
-	<description>Multiplication App - Gateway (Microservices - the Practical Way book)</description>
+	<name>service-registry</name>
+	<description>Multiplication App - Service Registry (Microservices - the Practical Way book)</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -28,22 +28,18 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-zuul</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-ribbon</artifactId>
+			<artifactId>spring-cloud-starter-eureka-server</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 
 		<dependency>
@@ -73,5 +69,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
