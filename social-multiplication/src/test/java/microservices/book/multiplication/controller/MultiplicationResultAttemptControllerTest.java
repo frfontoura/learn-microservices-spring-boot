@@ -24,8 +24,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(MultiplicationResultAttemptController.class)
@@ -73,17 +73,29 @@ public class MultiplicationResultAttemptControllerTest {
     }
 
     private void genericParameterizedTest(final boolean correct) throws Exception {
-        given(multiplicationService.checkAttempt(any(MultiplicationResultAttempt.class))).willReturn(correct);
-        User user = new User("tony_stark");
-        Multiplication multiplication = new Multiplication(50, 70);
-        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3500, correct);
+        // given (remember we're not testing here the service itself)
+        final User user = new User("john");
+        final Multiplication multiplication = new Multiplication(50, 70);
+        final MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
+                user, multiplication, 3500, correct);
+        given(multiplicationService
+                .checkAttempt(any(MultiplicationResultAttempt.class)))
+                .willReturn(attempt);
 
-        MockHttpServletResponse response = mvc.perform(post("/results")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonResult.write(attempt).getJson()))
+        // when
+        final MockHttpServletResponse response = mvc.perform(
+                post("/results").contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonResult.write(attempt).getJson()))
                 .andReturn().getResponse();
 
+        // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(jsonResult.write(attempt).getJson());
+        assertThat(response.getContentAsString()).isEqualTo(
+                jsonResult.write(
+                        new MultiplicationResultAttempt(attempt.getUser(),
+                                attempt.getMultiplication(),
+                                attempt.getResultAttempt(),
+                                correct)
+                ).getJson());
     }
 }

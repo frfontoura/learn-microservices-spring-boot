@@ -53,30 +53,49 @@ public class MultiplicationServiceImplTest {
 
     @Test
     public void checkCorrectAttemptTest() {
-        final Multiplication multiplication = new Multiplication(50,60);
-        final User user = new User("tony_stark");
-        final MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000, false);
-        final MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(user, multiplication, 3000, true);
-        final MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(), attempt.getUser().getId(), true);
-        given(userRepository.findByAlias("tony_stark")).willReturn(Optional.empty());
+        // given
+        final Multiplication multiplication = new Multiplication(50, 60);
+        final User user = new User("john_doe");
+        final MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
+                user, multiplication, 3000, false);
+        final MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(
+                user, multiplication, 3000, true);
+        final MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(),
+                attempt.getUser().getId(), true);
+        given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
+        // Note: the service will set correct to true
+        given(attemptRepository.save(verifiedAttempt)).willReturn(verifiedAttempt);
 
-        boolean attemptResult = multiplicationService.checkAttempt(attempt);
+        // when
+        final MultiplicationResultAttempt resultAttempt = multiplicationService.checkAttempt(attempt);
 
-        assertThat(attemptResult).isTrue();
+        // then
+        assertThat(resultAttempt.isCorrect()).isTrue();
         verify(attemptRepository).save(verifiedAttempt);
         verify(eventDispatcher).send(eq(event));
     }
 
     @Test
-    public void checkWrongAttempt() {
-        Multiplication multiplication = new Multiplication(50,60);
-        User user = new User("tony_stark");
-        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3010, false);
-        given(userRepository.findByAlias("tony_stark")).willReturn(Optional.empty());
+    public void checkWrongAttemptTest() {
+        // given
+        final Multiplication multiplication = new Multiplication(50, 60);
+        final User user = new User("john_doe");
+        final MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
+                user, multiplication, 3010, false);
+        final MultiplicationResultAttempt storedAttempt = new MultiplicationResultAttempt(
+                user, multiplication, 3010, false);
+        final MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(),
+                attempt.getUser().getId(), false);
+        given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
+        given(attemptRepository.save(attempt)).willReturn(storedAttempt);
 
-        boolean attemptResult = multiplicationService.checkAttempt(attempt);
-        assertThat(attemptResult).isFalse();
+        // when
+        final MultiplicationResultAttempt resultAttempt = multiplicationService.checkAttempt(attempt);
+
+        // then
+        assertThat(resultAttempt.isCorrect()).isFalse();
         verify(attemptRepository).save(attempt);
+        verify(eventDispatcher).send(eq(event));
     }
 
     @Test
